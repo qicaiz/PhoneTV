@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +25,12 @@ import cn.bmob.v3.listener.FindListener;
  */
 public class SatteliteLiveFragment extends Fragment {
 
+    private static final String TAG = "SatteliteLiveFragment";
     private List<Channel> mChannels;
     private ListView mChannelsListView;
 
     public SatteliteLiveFragment() {
+        Log.d(TAG, "SatteliteLiveFragment: run");
         // Required empty public constructor
     }
 
@@ -35,11 +38,14 @@ public class SatteliteLiveFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mChannels = new ArrayList<>();
+        Log.d(TAG, "onCreate: run");
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView: run");
         View view = inflater.inflate(R.layout.fragment_sattelite_live,container,false);
         mChannelsListView = (ListView) view.findViewById(R.id.channel_list);
         //网络请求卫视channel信息

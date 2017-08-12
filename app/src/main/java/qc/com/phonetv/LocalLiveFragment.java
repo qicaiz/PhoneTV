@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,9 +25,11 @@ import cn.bmob.v3.listener.FindListener;
  */
 public class LocalLiveFragment extends Fragment {
 
+    private static final String TAG = "LocalLiveFragment";
     private List<Channel> mChannels;
     private ListView mLocalChannelListView;
     public LocalLiveFragment() {
+        Log.d(TAG, "LocalLiveFragment: run");
         // Required empty public constructor
     }
 
@@ -34,11 +37,13 @@ public class LocalLiveFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mChannels = new ArrayList<>();
+        Log.d(TAG, "onCreate: run");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView: run");
         View view = inflater.inflate(R.layout.fragment_local_live,container,false);
         mLocalChannelListView = (ListView) view.findViewById(R.id.list_local_channel);
         //网络请求卫视channel信息

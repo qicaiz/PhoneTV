@@ -1,32 +1,26 @@
 package qc.com.phonetv;
 
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.content.ContentValues.TAG;
-
-
 /**
  * A simple {@link Fragment} subclass.
+ * 频道直播父页面，包括CentralLiveFragment,SatteliteLiveFragment,LocalLiveFragment三个fragment
  */
 public class LiveParentFragment extends Fragment {
-
+    private static final String TAG = "LiveParentFragment";
     private List<Fragment> mChildLiveFragmens;
     private String[] mFragmentTitles = {
       "央视",
@@ -34,13 +28,15 @@ public class LiveParentFragment extends Fragment {
       "地方台",
     };
     public LiveParentFragment() {
-        // Required empty public constructor
+        Log.d(TAG, "LiveParentFragment: run");
+        Log.d(TAG, "LiveParentFragment: exit");
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView: run");
         mChildLiveFragmens = new ArrayList<>();
         Fragment centralLiveFragment = new CentralLiveFragment();
         Fragment satteliteLiveFragment = new SatteliteLiveFragment();
@@ -53,6 +49,7 @@ public class LiveParentFragment extends Fragment {
         viewPager.setAdapter(new MyFragmentAdapter(getChildFragmentManager()));
         TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tablayout);
         tabLayout.setupWithViewPager(viewPager);
+        Log.d(TAG, "onCreateView: exit");
         return view;
     }
 
@@ -60,10 +57,12 @@ public class LiveParentFragment extends Fragment {
 
         public MyFragmentAdapter(FragmentManager fm) {
             super(fm);
+            Log.d(TAG, "MyFragmentAdapter: run");
         }
 
         @Override
         public Fragment getItem(int position) {
+            Log.d(TAG, "getItem: run");
             return mChildLiveFragmens.get(position);
         }
 
@@ -74,6 +73,7 @@ public class LiveParentFragment extends Fragment {
 
         @Override
         public CharSequence getPageTitle(int position) {
+            Log.d(TAG, "getPageTitle: run");
             return mFragmentTitles[position];
         }
     }
