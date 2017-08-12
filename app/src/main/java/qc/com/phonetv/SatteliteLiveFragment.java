@@ -9,10 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +53,7 @@ public class SatteliteLiveFragment extends Fragment {
                         mChannels.add(channel);
                     }
                 }
-                mChannelsListView.setAdapter(new SatteliteChannelAdapter());
+                mChannelsListView.setAdapter(new LiveAdapter(getContext(),mChannels));
             }
         });
         mChannelsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -69,53 +66,5 @@ public class SatteliteLiveFragment extends Fragment {
         });
         return view;
     }
-
-    class SatteliteChannelAdapter extends BaseAdapter{
-
-        @Override
-        public int getCount() {
-            return mChannels.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder = null;
-            if(convertView==null){
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_live_item,null);
-                holder = new ViewHolder();
-                holder.mmChannelLogo = (ImageView) convertView.findViewById(R.id.ivew_channel_logo);
-                holder.mmChannelName = (TextView) convertView.findViewById(R.id.txt_channel_name);
-                holder.mmChannelCurrentProgram = (TextView) convertView.findViewById(R.id.txt_channel_current_program);
-                holder.mmChannelNextProgram = (TextView) convertView.findViewById(R.id.txt_channel_next_program);
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-            Channel channel = mChannels.get(position);
-            holder.mmChannelName.setText(channel.getName());
-
-            holder.mmChannelLogo.setImageResource(R.mipmap.ic_launcher);
-
-            return convertView;
-        }
-    }
-
-    class ViewHolder{
-        public ImageView mmChannelLogo;
-        public TextView mmChannelName;
-        public TextView mmChannelCurrentProgram;
-        public TextView mmChannelNextProgram;
-    }
-
 
 }
