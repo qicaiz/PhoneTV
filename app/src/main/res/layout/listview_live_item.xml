@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingTop="9dp"
+    android:paddingBottom="9dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/ivew_channel_logo"
+        android:layout_width="167dp"
+        android:layout_height="98dp"
+        android:layout_marginLeft="11dp"
+        android:scaleType="fitXY"
+        />
+    <TextView
+        android:id="@+id/txt_channel_name"
+        android:layout_toRightOf="@id/ivew_channel_logo"
+        android:layout_marginLeft="11dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CCTV-1综合"
+        android:textSize="15sp"
+        />
+    <TextView
+        android:id="@+id/txt_channel_current_program"
+        android:layout_toRightOf="@id/ivew_channel_logo"
+        android:layout_below="@id/txt_channel_name"
+        android:layout_marginLeft="11dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="正在播出：新闻30分"
+        />
+    <TextView
+        android:id="@+id/txt_channel_next_program"
+        android:layout_toRightOf="@id/ivew_channel_logo"
+        android:layout_below="@id/txt_channel_current_program"
+        android:layout_marginLeft="11dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="即将播出：今日说法"
+        />
+
+</RelativeLayout>
