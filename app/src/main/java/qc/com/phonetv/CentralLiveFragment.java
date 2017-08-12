@@ -2,6 +2,7 @@ package qc.com.phonetv;
 
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ public class CentralLiveFragment extends Fragment {
     private List<Channel> mChannels;
     private LiveAdapter mAdapter;
     private View mRootView;
+    private ProgressBar mProgressBar;
 
     public CentralLiveFragment() {
         Log.d(TAG, "CentralLiveFragment: run");
@@ -59,6 +62,8 @@ public class CentralLiveFragment extends Fragment {
         if(mRootView==null){
             Log.d(TAG, "onCreateView: rootview==null run");
             mRootView = inflater.inflate(R.layout.fragment_central_live,container,false);
+            mProgressBar = (ProgressBar) mRootView.findViewById(R.id.progressbar);
+            mProgressBar.setVisibility(View.VISIBLE);
             mChannelListViw = (ListView) mRootView.findViewById(R.id.list_cctv);
             mChannelListViw.setAdapter(mAdapter);
             //网络请求播放地址
@@ -68,6 +73,7 @@ public class CentralLiveFragment extends Fragment {
                 @Override
                 public void done(List<Channel> list, BmobException e) {
                     Log.d(TAG, "Central Channel request done: run");
+                    mProgressBar.setVisibility(View.INVISIBLE);
                     mChannels.clear();
                     for(Channel channel:list){
                         if(channel.getType().equals(ChannelType.CENTRAL_CHANNEL)){

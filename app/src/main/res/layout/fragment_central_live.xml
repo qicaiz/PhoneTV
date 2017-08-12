@@ -1,10 +1,16 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="qc.com.phonetv.CentralLiveFragment">
 
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="invisible"/>
     <ListView
         android:id="@+id/list_cctv"
         android:layout_width="match_parent"
@@ -12,4 +18,4 @@
 
 
 
-</LinearLayout>
+</RelativeLayout>

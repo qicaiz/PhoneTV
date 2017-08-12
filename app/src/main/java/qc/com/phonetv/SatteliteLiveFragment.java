@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,9 @@ public class SatteliteLiveFragment extends Fragment {
     private static final String TAG = "SatteliteLiveFragment";
     private List<Channel> mChannels;
     private ListView mChannelsListView;
+    private View mRootView;
+    private ProgressBar mProgressBar;
+    private LiveAdapter mAdapter;
 
     public SatteliteLiveFragment() {
         Log.d(TAG, "SatteliteLiveFragment: run");
@@ -39,6 +43,7 @@ public class SatteliteLiveFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mChannels = new ArrayList<>();
         Log.d(TAG, "onCreate: run");
+        mAdapter = new LiveAdapter(getContext(),mChannels);
 
     }
 
@@ -46,31 +51,49 @@ public class SatteliteLiveFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: run");
-        View view = inflater.inflate(R.layout.fragment_sattelite_live,container,false);
-        mChannelsListView = (ListView) view.findViewById(R.id.channel_list);
-        //网络请求卫视channel信息
-        String tableName = "Channel";
-        BmobQuery<Channel> channelBmobQuery = new BmobQuery<>(tableName);
-        channelBmobQuery.findObjects(new FindListener<Channel>() {
-            @Override
-            public void done(List<Channel> list, BmobException e) {
-                for(Channel channel:list){
-                    if(channel.getType().equals(ChannelType.SATTELITE_CHANNEL)){
-                        mChannels.add(channel);
+        if(mRootView==null){
+            Log.d(TAG, "onCreateView: rootview==null run");
+            mRootView = inflater.inflate(R.layout.fragment_sattelite_live,container,false);
+            mProgressBar = (ProgressBar) mRootView.findViewById(R.id.progressbar);
+            mProgressBar.setVisibility(View.VISIBLE);
+            mChannelsListView = (ListView) mRootView.findViewById(R.id.channel_list);
+            mChannelsListView.setAdapter(mAdapter);
+            //网络请求卫视channel信息
+            String tableName = "Channel";
+            BmobQuery<Channel> channelBmobQuery = new BmobQuery<>(tableName);
+            channelBmobQuery.findObjects(new FindListener<Channel>() {
+                @Override
+                public void done(List<Channel> list, BmobException e) {
+                    Log.d(TAG, "done: query sattlelite channel run");
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                    mChannels.clear();
+                    for(Channel channel:list){
+                        if(channel.getType().equals(ChannelType.SATTELITE_CHANNEL)){
+                            mChannels.add(channel);
+                        }
                     }
+                    mAdapter.notifyDataSetChanged();
                 }
-                mChannelsListView.setAdapter(new LiveAdapter(getContext(),mChannels));
+
+
+            });
+            mChannelsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getContext(),PlayActivity.class);
+                    intent.putExtra("CHANNEL",mChannels.get(position));
+                    startActivity(intent);
+                }
+            });
+        } else {
+            Log.d(TAG, "onCreateView: rootview !=null run");
+            ViewGroup parent = (ViewGroup) mRootView.getParent();
+            if(parent!=null){
+                parent.removeView(mRootView);
             }
-        });
-        mChannelsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getContext(),PlayActivity.class);
-                intent.putExtra("CHANNEL",mChannels.get(position));
-                startActivity(intent);
-            }
-        });
-        return view;
+        }
+
+        return mRootView;
     }
 
 }

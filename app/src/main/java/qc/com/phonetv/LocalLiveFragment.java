@@ -9,8 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,9 @@ public class LocalLiveFragment extends Fragment {
     private static final String TAG = "LocalLiveFragment";
     private List<Channel> mChannels;
     private ListView mLocalChannelListView;
+    private View mRootView;
+    private ProgressBar mProgressBar;
+    private LiveAdapter mAdapter;
     public LocalLiveFragment() {
         Log.d(TAG, "LocalLiveFragment: run");
         // Required empty public constructor
@@ -37,38 +42,55 @@ public class LocalLiveFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mChannels = new ArrayList<>();
-        Log.d(TAG, "onCreate: run");
+
+        mAdapter = new LiveAdapter(getContext(),mChannels);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: run");
-        View view = inflater.inflate(R.layout.fragment_local_live,container,false);
-        mLocalChannelListView = (ListView) view.findViewById(R.id.list_local_channel);
-        //网络请求卫视channel信息
-        String tableName = "Channel";
-        BmobQuery<Channel> channelBmobQuery = new BmobQuery<>(tableName);
-        channelBmobQuery.findObjects(new FindListener<Channel>() {
-            @Override
-            public void done(List<Channel> list, BmobException e) {
-                for(Channel channel:list){
-                    if(channel.getType().equals(ChannelType.LOCAL_CHANNEL)){
-                        mChannels.add(channel);
+        if(mRootView==null){
+            Log.d(TAG, "onCreateView: rootview==null run");
+            mRootView = inflater.inflate(R.layout.fragment_local_live,container,false);
+            mProgressBar = (ProgressBar) mRootView.findViewById(R.id.progressbar);
+            mProgressBar.setVisibility(View.VISIBLE);
+            mLocalChannelListView = (ListView) mRootView.findViewById(R.id.list_local_channel);
+            mLocalChannelListView.setAdapter(mAdapter);
+            //网络请求卫视channel信息
+            String tableName = "Channel";
+            BmobQuery<Channel> channelBmobQuery = new BmobQuery<>(tableName);
+            channelBmobQuery.findObjects(new FindListener<Channel>() {
+                @Override
+                public void done(List<Channel> list, BmobException e) {
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                    Log.d(TAG, "done: request channel run");
+                    mChannels.clear();
+                    for(Channel channel:list){
+                        if(channel.getType().equals(ChannelType.LOCAL_CHANNEL)){
+                            mChannels.add(channel);
+                        }
                     }
+                    mAdapter.notifyDataSetChanged();
                 }
-                mLocalChannelListView.setAdapter(new LiveAdapter(getContext(),mChannels));
+            });
+            mLocalChannelListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getContext(),PlayActivity.class);
+                    intent.putExtra("CHANNEL",mChannels.get(position));
+                    startActivity(intent);
+                }
+            });
+        } else {
+            Log.d(TAG, "onCreateView: rootview !=null run");
+            ViewGroup parent = (ViewGroup) mRootView.getParent();
+            if(parent!=null){
+                parent.removeView(mRootView);
             }
-        });
-        mLocalChannelListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getContext(),PlayActivity.class);
-                intent.putExtra("CHANNEL",mChannels.get(position));
-                startActivity(intent);
-            }
-        });
-        return view;
+        }
+
+        return mRootView;
     }
 
 }
