@@ -4,7 +4,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.qc.idetest.PlayActivity">
+    tools:context="qc.com.phonetv.PlayActivity">
 
     <RelativeLayout
         android:id="@+id/player_parent"
@@ -24,11 +24,19 @@
             />
         <ImageView
             android:id="@+id/img_transfer"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:src="@mipmap/ic_launcher"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/vp_play_video_fullscreen"
             android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_centerVertical="true"
             />
+        <ProgressBar
+            android:id="@+id/progressbar"
+            android:layout_centerInParent="true"
+            android:visibility="invisible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </RelativeLayout>
 
     <TextView

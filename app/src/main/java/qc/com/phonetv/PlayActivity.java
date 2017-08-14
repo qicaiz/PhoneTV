@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -37,6 +38,7 @@ public class PlayActivity extends AppCompatActivity {
 
     private ImageView mPlayView;
     private ImageView mTransfer;
+    private ProgressBar mProgressBar;
 
     private TextView mTxtPercent;
     private TextView mTxtInfo;
@@ -60,6 +62,7 @@ public class PlayActivity extends AppCompatActivity {
         mPlayerParent = (RelativeLayout) findViewById(R.id.player_parent);
         mSurfaceView = (SurfaceView) findViewById(R.id.surface_view);
         mPlayView = (ImageView) findViewById(R.id.ivew_play);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressbar);
         mPlayer = new MediaPlayer();
         mSurfaceHolder = mSurfaceView.getHolder();
         if(mChannel!=null){
@@ -70,6 +73,7 @@ public class PlayActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     mPlayView.setVisibility(View.GONE);
+                    mProgressBar.setVisibility(View.VISIBLE);
                     try {
                         mPlayer.setDataSource(mChannelSourceAddr);
                         mPlayer.setDisplay(mSurfaceHolder);
@@ -99,8 +103,15 @@ public class PlayActivity extends AppCompatActivity {
         mPlayer.setOnInfoListener(new MediaPlayer.OnInfoListener() {
             @Override
             public boolean onInfo(MediaPlayer mp, int what, int extra) {
-//                mTxtInfo.setText("what="+what+"extra = "+extra);
                 mTxtInfo.append("what="+what+"extra = "+extra+"\n");
+                if(what==MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START||
+                        what == MediaPlayer.MEDIA_INFO_BUFFERING_END){
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                }
+                if(what==MediaPlayer.MEDIA_INFO_BUFFERING_START){
+                    mProgressBar.setVisibility(View.VISIBLE);
+                }
+
                 return false;
                 /**
                  * MEDIA_INFO_VIDEO_RENDERING_START=3
@@ -181,9 +192,19 @@ public class PlayActivity extends AppCompatActivity {
         }
 
     }
+
+    @Override
+    public void onBackPressed() {
+        if(getRequestedOrientation()==ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            finish();
+        }
+    }
+
     /*
-    * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
-     */
+        * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
+         */
     public int dp2px(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
