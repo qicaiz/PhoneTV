@@ -80,6 +80,31 @@ public class CentralLiveFragment extends Fragment {
                             mChannels.add(channel);
                         }
                     }
+                    //sort channel by id
+                    List<Channel> tempChannels = new ArrayList<>();
+                    int size = mChannels.size();
+                    Log.d(TAG, "done: channel size="+size);
+                    for(int i=0;i<size;i++){
+
+                        for(int j=i;j<size;j++){
+
+                            int idI = Integer.valueOf(mChannels.get(i).getId());
+                            int idJ = Integer.valueOf(mChannels.get(j).getId());
+                            if(idJ<idI){
+                                Log.d(TAG, "done: channel size j="+j);
+                                Channel tempI = mChannels.get(i);
+                                Channel tempJ = mChannels.get(j);
+                                mChannels.remove(i);
+                                mChannels.add(i,tempJ);
+                                mChannels.remove(j);
+                                mChannels.add(j,tempI);
+                            }
+
+                        }
+
+                    }
+
+
                     mAdapter.notifyDataSetChanged();
                 }
             });

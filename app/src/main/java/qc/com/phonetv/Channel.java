@@ -15,8 +15,17 @@ public class Channel extends BmobObject implements Serializable{
     private String currentProgram;
     private String nextProgram;
     private String type;
+    private String id;
 
     public Channel() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getType() {
