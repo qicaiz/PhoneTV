@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +36,7 @@ public class SatteliteLiveFragment extends Fragment {
     private View mRootView;
     private ProgressBar mProgressBar;
     private LiveAdapter mAdapter;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     public SatteliteLiveFragment() {
         Log.d(TAG, "SatteliteLiveFragment: run");
@@ -54,29 +59,26 @@ public class SatteliteLiveFragment extends Fragment {
         if(mRootView==null){
             Log.d(TAG, "onCreateView: rootview==null run");
             mRootView = inflater.inflate(R.layout.fragment_sattelite_live,container,false);
+            mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swiperefresh);
+            mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    for(Channel channel:mChannels){
+                        if(!TextUtils.isEmpty(channel.getPosterAddress())){
+                            Picasso.with(getContext()).invalidate(channel.getPosterAddress());
+                        }
+                    }
+                    mChannels.clear();
+                    mAdapter.notifyDataSetChanged();
+                    requestChannel();
+                }
+            });
             mProgressBar = (ProgressBar) mRootView.findViewById(R.id.progressbar);
             mProgressBar.setVisibility(View.VISIBLE);
             mChannelsListView = (ListView) mRootView.findViewById(R.id.channel_list);
             mChannelsListView.setAdapter(mAdapter);
-            //网络请求卫视channel信息
-            String tableName = "Channel";
-            BmobQuery<Channel> channelBmobQuery = new BmobQuery<>(tableName);
-            channelBmobQuery.findObjects(new FindListener<Channel>() {
-                @Override
-                public void done(List<Channel> list, BmobException e) {
-                    Log.d(TAG, "done: query sattlelite channel run");
-                    mProgressBar.setVisibility(View.INVISIBLE);
-                    mChannels.clear();
-                    for(Channel channel:list){
-                        if(channel.getType().equals(ChannelType.SATTELITE_CHANNEL)){
-                            mChannels.add(channel);
-                        }
-                    }
-                    mAdapter.notifyDataSetChanged();
-                }
+            requestChannel();
 
-
-            });
             mChannelsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -94,6 +96,29 @@ public class SatteliteLiveFragment extends Fragment {
         }
 
         return mRootView;
+    }
+
+    private void requestChannel(){
+        //网络请求卫视channel信息
+        String tableName = "Channel";
+        BmobQuery<Channel> channelBmobQuery = new BmobQuery<>(tableName);
+        channelBmobQuery.findObjects(new FindListener<Channel>() {
+            @Override
+            public void done(List<Channel> list, BmobException e) {
+                Log.d(TAG, "done: query sattlelite channel run");
+                mProgressBar.setVisibility(View.INVISIBLE);
+                mChannels.clear();
+                for(Channel channel:list){
+                    if(channel.getType().equals(ChannelType.SATTELITE_CHANNEL)){
+                        mChannels.add(channel);
+                    }
+                }
+                mAdapter.notifyDataSetChanged();
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+
+
+        });
     }
 
 }
