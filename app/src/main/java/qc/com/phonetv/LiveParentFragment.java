@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A simple {@link Fragment} subclass.
+ *
  * 频道直播父页面，包括CentralLiveFragment,SatteliteLiveFragment,LocalLiveFragment三个fragment
  */
 public class LiveParentFragment extends Fragment {

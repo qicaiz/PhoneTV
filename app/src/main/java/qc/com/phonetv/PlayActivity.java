@@ -5,26 +5,28 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
-import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayActivity extends AppCompatActivity {
 
@@ -40,11 +42,30 @@ public class PlayActivity extends AppCompatActivity {
     private ImageView mTransfer;
     private ProgressBar mProgressBar;
 
-    private TextView mTxtPercent;
-    private TextView mTxtInfo;
-    private TextView mTxtError;
-
     private Handler mHandler;
+    /**
+     * 播放器下方的ViewPager
+     */
+    private ViewPager mViewPager;
+    /**
+     * ViewPager子Fragment标题
+     */
+    private TabLayout mTabLayout;
+    /**
+     * 播放器下方的Fragment集合
+     */
+    private List<Fragment> mBottomFragments;
+    /**
+     * 节目单Fragment
+     */
+    private Fragment mProgramFragment;
+    /**
+     * 待定Fragment
+     */
+    private Fragment mPendingFragment;
+    private String[] mFragmentTitles={
+        "节目单","待定"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,14 +76,21 @@ public class PlayActivity extends AppCompatActivity {
             mChannel = (Channel) intent.getSerializableExtra("CHANNEL");
         }
         mHandler = new Handler();
-        mTxtPercent = (TextView) findViewById(R.id.txt_percent);
-        mTxtInfo= (TextView) findViewById(R.id.txt_info);
-        mTxtError = (TextView) findViewById(R.id.txt_error);
         mTransfer = (ImageView) findViewById(R.id.img_transfer);
         mPlayerParent = (RelativeLayout) findViewById(R.id.player_parent);
         mSurfaceView = (SurfaceView) findViewById(R.id.surface_view);
         mPlayView = (ImageView) findViewById(R.id.ivew_play);
         mProgressBar = (ProgressBar) findViewById(R.id.progressbar);
+        mBottomFragments = new ArrayList<>();
+        mProgramFragment = new ProgramFragment();
+        mPendingFragment = new PendingFragment();
+        mBottomFragments.add(mProgramFragment);
+        mBottomFragments.add(mPendingFragment);
+        mViewPager = findViewById(R.id.viewpager);
+        mViewPager.setAdapter(new MyFragmentAdapter(getSupportFragmentManager()));
+        mTabLayout=findViewById(R.id.tablayout);
+        mTabLayout.setupWithViewPager(mViewPager);
+
         mPlayer = new MediaPlayer();
         mSurfaceHolder = mSurfaceView.getHolder();
         if(mChannel!=null){
@@ -96,14 +124,12 @@ public class PlayActivity extends AppCompatActivity {
             @Override
             public void onBufferingUpdate(MediaPlayer mp, int percent) {
                 Log.d(TAG, "onBufferingUpdate: percent="+percent);
-                mTxtPercent.setText("percent="+percent);
             }
         });
 
         mPlayer.setOnInfoListener(new MediaPlayer.OnInfoListener() {
             @Override
             public boolean onInfo(MediaPlayer mp, int what, int extra) {
-                mTxtInfo.append("what="+what+"extra = "+extra+"\n");
                 if(what==MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START||
                         what == MediaPlayer.MEDIA_INFO_BUFFERING_END){
                     mProgressBar.setVisibility(View.INVISIBLE);
@@ -122,7 +148,6 @@ public class PlayActivity extends AppCompatActivity {
         mPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                mTxtError.append("error what = "+what+"extra="+extra);
                 return false;
             }
         });
@@ -192,6 +217,29 @@ public class PlayActivity extends AppCompatActivity {
         }
 
     }
+
+    private class MyFragmentAdapter extends FragmentPagerAdapter{
+
+        public MyFragmentAdapter(FragmentManager fm){
+            super(fm);
+        }
+        @Override
+        public Fragment getItem(int i) {
+            return mBottomFragments.get(i);
+        }
+
+        @Override
+        public int getCount() {
+            return mBottomFragments.size();
+        }
+
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitles[position];
+        }
+    }
+
 
     @Override
     public void onBackPressed() {
